@@ -37,8 +37,8 @@ int main(void){
         {
           //uartTransmit(&data[0], dataLength,uartCoreStateHandleTransmit);
           //uartReceive(&buffer[0], bufferLength, uartCoreStateHandleReceive);
-          uartReceive(&buffer[0], bufferLength, uartCoreStateHandleReceiveTransmit);
-          uartTransmit(&data[0], dataLength,uartCoreStateHandleReceiveTransmit);
+          halUartRx(&buffer[0], bufferLength, uartCoreStateHandleReceiveTransmit);
+          halUartTx(&data[0], dataLength,uartCoreStateHandleReceiveTransmit);
         }
 
 }
