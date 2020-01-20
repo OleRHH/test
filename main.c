@@ -7,39 +7,37 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include "hal/uart/uart.h"
 #include "inc/tm4c1294ncpdt.h"
 
-int main(void){
-    char data[] = { 'B', 'A', '_', 'S', 'A', 'A', 'K', 'E', 'T', '_', 'T', 'I','M', 'S', 'I', 'N', 'A', '\0' };
-    unsigned int dataLength = sizeof(data) / sizeof(char);
+enum MessageLength_ {
+    messageLength_ = 6
+};
 
-    char buffer[5];
-    int bufferLength = sizeof(buffer) / sizeof(char);
+static char const greetingMessage[messageLength_ + 1] = "Echo:\n";
+static char buffer[messageLength_];
 
-    // Required values settings for UART2
+int main(void) {
+
+    // UART driver initialization
+    halUartDriverInit();
+
+    // UART2 core initialization
     enum HalUartBaudRate uartBaudRate = uartBaudRate115200;
     enum HalUartWordLength uartWordlength = uartEightBits;
     enum HalUartStopBit uartStopBit = uartOneStopBit;
     enum HalUartParity uartParity = uartNoParity;
-
-
-
-    // UART initialization
-    halUartDriverInit();
-   // HalUartCoreStateHandle uartCoreStateHandleTransmit = halUartCoreInit(uart2RxNoneTxPD5, uartBaudRate, uartWordlength, uartStopBit, uartParity);
-   // HalUartCoreStateHandle uartCoreStateHandleReceive = halUartCoreInit(uart2RxPD4TxNone, uartBaudRate, uartWordlength, uartStopBit, uartParity);
     HalUartCoreStateHandle uartCoreStateHandleReceiveTransmit = halUartCoreInit(uart2RxPD4TxPD5, uartBaudRate, uartWordlength, uartStopBit, uartParity);
 
+    // greeting message
+    halUartTx(&greetingMessage[0], messageLength_, uartCoreStateHandleReceiveTransmit);
 
+    // echo functionality
     while (1)
-        {
-          //uartTransmit(&data[0], dataLength,uartCoreStateHandleTransmit);
-          //uartReceive(&buffer[0], bufferLength, uartCoreStateHandleReceive);
-          halUartRx(&buffer[0], bufferLength, uartCoreStateHandleReceiveTransmit);
-          halUartTx(&data[0], dataLength,uartCoreStateHandleReceiveTransmit);
-        }
+    {
+        halUartRx(&buffer[0], messageLength_, uartCoreStateHandleReceiveTransmit);
+        halUartTx(&buffer[0], messageLength_, uartCoreStateHandleReceiveTransmit);
+    }
 
 }
 
